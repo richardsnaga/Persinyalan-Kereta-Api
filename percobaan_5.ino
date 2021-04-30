@@ -49,6 +49,8 @@ int state = S00;
 int input = NO_PRESS;
 
 int SetRouteButton = 0;
+int SetRouteButtonnow;
+
 
 //----------------------------------
 
@@ -68,7 +70,6 @@ String STCB1 = "TCB1 OFF|";
 String STCB2 = "TCB2 OFF|";
 String STCC1 = "TCC1 OFF|";
 String STCC2 = "TCC2 OFF|";
-
 
 void setup() {
 
@@ -111,61 +112,57 @@ void loop() {
   RTCB2 = digitalRead(TCB2);
   RTCC1 = digitalRead(TCC1);
   RTCC2 = digitalRead(TCC2);
-
   if(Serial.available()>0){
     SetRouteButton = Serial.read();
-    if(SetRouteButton==1){
-      input = SRAC_PRESS;
-    }
-    else if(SetRouteButton==2){
-      input = SRCA_PRESS;
-    }
-    else if(SetRouteButton==3){
-      input = SRBC_PRESS;
-    }
-    else if(SetRouteButton==4){
-      input = SRCB_PRESS;
-    }
-    else {
-      digitalWrite(LAM, HIGH); 
-      digitalWrite(LAH, LOW);
-      digitalWrite(LBM, HIGH); 
-      digitalWrite(LBH, LOW);
-      digitalWrite(LCM, HIGH);  
-      digitalWrite(LCH, LOW);
-  
-      digitalWrite(LW1M, HIGH); 
-      digitalWrite(LW1K, LOW); 
-      digitalWrite(LW1H, LOW);
-      digitalWrite(LW2M, HIGH); 
-      digitalWrite(LW2K, LOW); 
-      digitalWrite(LW2H, LOW);
-  
-      w1.write(0);
-      w2.write(0);
-  
-      Serial.print(SLA);
-      Serial.print(SLB);
-      Serial.print(SLC);
-  
-      Serial.print(SLW1);
-      Serial.print(SLW2);
-
-      Serial.print(SW1);
-      Serial.print(SW2);
-
-      Serial.print(STCA1);
-      Serial.print(STCA2);
-      Serial.print(STCB1);
-      Serial.print(STCB2);
-      Serial.print(STCC1);
-      Serial.print(STCC2);
-    }
+      if(SetRouteButton==1){
+        input = SRAC_PRESS;
+      }
+      else if(SetRouteButton==2){
+        input = SRCA_PRESS;
+      }
+      else if(SetRouteButton==3){
+        input = SRBC_PRESS;
+      }
+      else if(SetRouteButton==4){
+        input = SRCB_PRESS;
+      }
+      else {
+        digitalWrite(LAM, HIGH); 
+        digitalWrite(LAH, LOW);
+        digitalWrite(LBM, HIGH); 
+        digitalWrite(LBH, LOW);
+        digitalWrite(LCM, HIGH);  
+        digitalWrite(LCH, LOW);
     
+        digitalWrite(LW1M, HIGH); 
+        digitalWrite(LW1K, LOW); 
+        digitalWrite(LW1H, LOW);
+        digitalWrite(LW2M, HIGH); 
+        digitalWrite(LW2K, LOW); 
+        digitalWrite(LW2H, LOW);
     
-  }
+//        w1.write(0);
+//        w2.write(0);
+    
+        Serial.print(SLA);
+        Serial.print(SLB);
+        Serial.print(SLC);
+    
+        Serial.print(SLW1);
+        Serial.print(SLW2);
+  
+        Serial.print(SW1);
+        Serial.print(SW2);
+  
+        Serial.print(STCA1);
+        Serial.print(STCA2);
+        Serial.print(STCB1);
+        Serial.print(STCB2);
+        Serial.print(STCC1);
+        Serial.print(STCC2);
+      }
+    }
   fsm();
-  
 }
 
 void fsm(){
@@ -215,11 +212,12 @@ void fsm(){
       
       STCC1 = "TCC1 OFF|";
       STCA2 = "TCA2 OFF|";
-      delay(3000);
+//      delay(3000);
       if(RTCC1==HIGH&&RTCA2==HIGH) {
         Serial.print(STCC1);
         Serial.print(STCA2);
         state = 110;
+        w2.write(120);
       }
       else {
         state = 100;
@@ -228,11 +226,12 @@ void fsm(){
     else if(input==SRCA_PRESS){
       STCA1 = "TCA1 OFF|";
       STCC2 = "TCC2 OFF|";
-      delay(3000);
+      
       if(RTCA1==HIGH&&RTCC2==HIGH) {
         Serial.print(STCA1);
         Serial.print(STCC2);
         state = 210;
+        w1.write(120);
       }
       else {
         state = 100;
@@ -241,11 +240,12 @@ void fsm(){
     else if(input==SRBC_PRESS){
       STCC1 = "TCC1 OFF|";
       STCB2 = "TCB2 OFF|";
-      delay(3000);
+      
       if(RTCC1==HIGH&&RTCB2==HIGH) {
         Serial.print(STCC1);
         Serial.print(STCB2);
         state = 310;
+        w2.write(45);
       }
       else {
         state = 100;
@@ -254,11 +254,12 @@ void fsm(){
     else if(input==SRCB_PRESS){
       STCB1 = "TCB1 OFF|";
       STCC2 = "TCC2 OFF|";
-      delay(3000);
+      
       if(RTCB2==HIGH&&RTCC2==HIGH) {
         Serial.print(STCB1);
         Serial.print(STCC2);
         state = 410;
+        w1.write(45);
       }
       else {
         state = 100;
@@ -270,11 +271,10 @@ void fsm(){
     //-------------------------------------------------------------------------------------------STATE SRAC
     case 110:
     STCA1 = "TCA1 ON|";
-    delay(3000);
+    
     if (RTCA1==LOW) {
       Serial.print(STCA1);
       state = 111;
-      delay(3000);
     }
     else {
       state = 110;
@@ -302,12 +302,12 @@ void fsm(){
 
     STCA2 = "TCA2 ON|";
     STCA1 = "TCA1 OFF|";
-    delay(3000);
+    
     if (RTCA2==LOW&&RTCA1==HIGH) {
       Serial.print(STCA2);
       Serial.print(STCA1);
       state = 112;
-      delay(3000);
+      
     }
     else {
       state = 111;
@@ -338,13 +338,12 @@ void fsm(){
     STCC1 = "TCC1 ON|";
     STCA2 = "TCA2 OFF|";
     STCA1 = "TCA1 OFF|";
-    delay(3000);
+    
     if (RTCC1==LOW&&RTCA2==HIGH&&RTCA1==HIGH) {
       Serial.print(STCC1);
       Serial.print(STCA2);
       Serial.print(STCA1);
       state = 100;
-      delay(3000);
     }
     else {
       state = 112;
@@ -354,11 +353,11 @@ void fsm(){
     //-------------------------------------------------------------------------------------------STATE SRCA
     case 210:
     STCC1 = "TCC1 ON|";
-    delay(3000);
+    
     if (RTCC1==LOW) {
       Serial.print(STCC1);
       state = 211;
-      delay(3000);
+      
     }
     else {
       state = 210;
@@ -385,12 +384,12 @@ void fsm(){
     
     STCC2 = "TCC2 ON|";
     STCC1 = "TCC1 OFF|";
-    delay(3000);
+    
     if (RTCC2==LOW&&RTCC1==HIGH) {
       Serial.print(STCC2);
       Serial.print(STCC1);
       state = 212;
-    delay(3000);
+    
     }
     else {
       state = 211;
@@ -419,13 +418,13 @@ void fsm(){
     STCA1 = "TCA1 ON|";
     STCC2 = "TCC2 OFF|";
     STCC1 = "TCC1 OFF|";
-    delay(3000);
+    
     if (RTCA1==LOW&&RTCC2==HIGH&&RTCC1==HIGH) {
       Serial.print(STCA1);
       Serial.print(STCC2);
       Serial.print(STCC1);
-      state = 100;
-      delay(3000);
+      state = 100;  
+      SetRouteButtonnow = 3;
     }
     else {
       state = 212;
@@ -435,11 +434,11 @@ void fsm(){
     //-------------------------------------------------------------------------------------------STATE SRBC
     case 310:
     STCB1 = "TCB1 ON|";
-    delay(3000);
+    
     if (RTCB1==LOW) {
       Serial.print(STCB1);
       state = 311;
-      delay(3000);
+      
     }
     else {
       state = 310;
@@ -468,12 +467,12 @@ void fsm(){
     
     STCB2 = "TCB2 ON|";
     STCB1 = "TCB1 OFF|";
-    delay(3000);
+    
     if (RTCB2==LOW&&RTCB1==HIGH) {
       Serial.print(STCB2);
       Serial.print(STCB1);
       state = 312;
-      delay(3000);
+      
     }
     else {
       state = 311;
@@ -503,13 +502,14 @@ void fsm(){
     STCC1 = "TCC1 ON|";
     STCB2 = "TCB2 OFF|";
     STCB1 = "TCB1 OFF|";
-    delay(3000);
+    
     if (RTCC1==LOW&&RTCB2==HIGH&&RTCB1==HIGH) {
       Serial.print(STCC1);
       Serial.print(STCB2);
       Serial.print(STCB1);
       state = 100;
-      delay(3000);
+      SetRouteButtonnow = 4;
+      
     }
     else {
       state = 312;
@@ -519,11 +519,11 @@ void fsm(){
     //-------------------------------------------------------------------------------------------STATE SRCB
    case 410:
    STCC1 = "TCC1 ON|";
-   delay(3000);
+   
     if (RTCC1==LOW) {
       Serial.print(STCC1);
       state = 411;
-      delay(3000);
+      
     }
     else {
       state = 410;
@@ -552,12 +552,12 @@ void fsm(){
     
     STCC2 = "TCC2 ON|";
     STCC1 = "TCC1 OFF|";
-    delay(3000);
+    
     if (RTCC2==LOW&&RTCC1==HIGH) {
       Serial.print(STCC2);
       Serial.print(STCC1);
       state = 412;
-      delay(3000);
+      
     }
     else {
       state = 411;
@@ -587,13 +587,14 @@ void fsm(){
     STCB1 = "TCB1 ON|";
     STCC2 = "TCC2 OFF|";
     STCC1 = "TCB1 OFF|";
-    delay(3000);
+    
     if (RTCB1==LOW&&RTCC2==HIGH&&RTCC1==HIGH) {
       Serial.print(STCB1);
       Serial.print(STCC2);
       Serial.print(STCC1);
       state = 100;
-      delay(3000);
+      SetRouteButtonnow = 1;
+      
     }
     else {
       state = 412;
