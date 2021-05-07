@@ -49,7 +49,7 @@ int state = S00;
 int input = NO_PRESS;
 
 int SetRouteButton = 0;
-int SetRouteButtonnow ;
+int Habisdari;
 int i = 0;
 
 //----------------------------------
@@ -113,21 +113,27 @@ void loop() {
   RTCC1 = digitalRead(TCC1);
   RTCC2 = digitalRead(TCC2);
   
-  if(Serial.available()>0){
+  if(Serial.available()>0&&state==100){
     SetRouteButton = Serial.read();
-    if(i==0){
-      SetRouteButtonnow=SetRouteButton;
-      i=1;
-    }
-    if(SetRouteButton==SetRouteButtonnow){
-      blt();
+    if(Habisdari!=SetRouteButton){
+      if(Habisdari==1&&SetRouteButton==2||Habisdari==2&&SetRouteButton==3||Habisdari==2&&SetRouteButton==4||Habisdari==3&&SetRouteButton==1||Habisdari==4&&SetRouteButton==1||Habisdari==4&&SetRouteButton==2){
+        SetRouteButton = 0;
       }
+      else{
+        blt();
+      }
+    }
+   }
+   else if(Serial.read()>0&&state!=100) {
+    SetRouteButton = 0;
+   }
+   else{
+    SetRouteButton = 0;    
    }
   fsm();
 }
 
 void blt(){
-  if(state==100){
     if(SetRouteButton==1){
       input = SRAC_PRESS;
     }
@@ -172,7 +178,7 @@ void blt(){
       Serial.print(STCC1);
       Serial.print(STCC2);
     }
-  }
+  
 }
 
 void fsm(){
@@ -217,6 +223,9 @@ void fsm(){
     Serial.print(STCC1);
     Serial.print(STCC2);
 
+    
+    Serial.print(input);
+    Serial.print("--------------------------------------------------------");
     //---------------------------------------------------- TOMBOL DITEKAN
     if (input==SRAC_PRESS) {
       STCC1 = "TCC1 OFF|";
@@ -356,8 +365,8 @@ void fsm(){
       Serial.print(STCC1);
       Serial.print(STCA2);
       Serial.print(STCA1);
-      SetRouteButtonnow = 2;
-      input = 0;
+      Habisdari = 1;
+      input = NO_PRESS;
       state = 100;
     }
     else {
@@ -439,8 +448,8 @@ void fsm(){
       Serial.print(STCA1);
       Serial.print(STCC2);
       Serial.print(STCC1);
-      SetRouteButtonnow = 3;
-      input = 0;
+      Habisdari = 2;
+      input = NO_PRESS;
       state = 100;
     }
     else {
@@ -525,8 +534,8 @@ void fsm(){
       Serial.print(STCC1);
       Serial.print(STCB2);
       Serial.print(STCB1);
-      SetRouteButtonnow = 4;
-      input = 0;
+      Habisdari = 3;
+      input = NO_PRESS;
       state = 100;
     }
     else {
@@ -611,8 +620,8 @@ void fsm(){
       Serial.print(STCB1);
       Serial.print(STCC2);
       Serial.print(STCC1);
-      SetRouteButtonnow = 1;
-      input = 0;
+      Habisdari = 4;
+      input = NO_PRESS;
       state = 100;
     }
     else {
