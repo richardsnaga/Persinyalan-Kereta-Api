@@ -49,8 +49,8 @@ int state = S00;
 int input = NO_PRESS;
 
 int SetRouteButton = 0;
-int SetRouteButtonnow;
-
+int SetRouteButtonnow ;
+int i = 0;
 
 //----------------------------------
 
@@ -112,57 +112,67 @@ void loop() {
   RTCB2 = digitalRead(TCB2);
   RTCC1 = digitalRead(TCC1);
   RTCC2 = digitalRead(TCC2);
+  
   if(Serial.available()>0){
     SetRouteButton = Serial.read();
-      if(SetRouteButton==1){
-        input = SRAC_PRESS;
-      }
-      else if(SetRouteButton==2){
-        input = SRCA_PRESS;
-      }
-      else if(SetRouteButton==3){
-        input = SRBC_PRESS;
-      }
-      else if(SetRouteButton==4){
-        input = SRCB_PRESS;
-      }
-      else {
-        digitalWrite(LAM, HIGH); 
-        digitalWrite(LAH, LOW);
-        digitalWrite(LBM, HIGH); 
-        digitalWrite(LBH, LOW);
-        digitalWrite(LCM, HIGH);  
-        digitalWrite(LCH, LOW);
-    
-        digitalWrite(LW1M, HIGH); 
-        digitalWrite(LW1K, LOW); 
-        digitalWrite(LW1H, LOW);
-        digitalWrite(LW2M, HIGH); 
-        digitalWrite(LW2K, LOW); 
-        digitalWrite(LW2H, LOW);
-    
-//        w1.write(0);
-//        w2.write(0);
-    
-        Serial.print(SLA);
-        Serial.print(SLB);
-        Serial.print(SLC);
-    
-        Serial.print(SLW1);
-        Serial.print(SLW2);
-  
-        Serial.print(SW1);
-        Serial.print(SW2);
-  
-        Serial.print(STCA1);
-        Serial.print(STCA2);
-        Serial.print(STCB1);
-        Serial.print(STCB2);
-        Serial.print(STCC1);
-        Serial.print(STCC2);
-      }
+    if(i==0){
+      SetRouteButtonnow=SetRouteButton;
+      i=1;
     }
+    if(SetRouteButton==SetRouteButtonnow){
+      blt();
+      }
+   }
   fsm();
+}
+
+void blt(){
+  if(state==100){
+    if(SetRouteButton==1){
+      input = SRAC_PRESS;
+    }
+    else if(SetRouteButton==2){
+      input = SRCA_PRESS;
+    }
+    else if(SetRouteButton==3){
+      input = SRBC_PRESS;
+    }
+    else if(SetRouteButton==4){
+      input = SRCB_PRESS;
+    }
+    else {
+      digitalWrite(LAM, HIGH); 
+      digitalWrite(LAH, LOW);
+      digitalWrite(LBM, HIGH); 
+      digitalWrite(LBH, LOW);
+      digitalWrite(LCM, HIGH);  
+      digitalWrite(LCH, LOW);
+  
+      digitalWrite(LW1M, HIGH); 
+      digitalWrite(LW1K, LOW); 
+      digitalWrite(LW1H, LOW);
+      digitalWrite(LW2M, HIGH); 
+      digitalWrite(LW2K, LOW); 
+      digitalWrite(LW2H, LOW);
+  
+      Serial.print(SLA);
+      Serial.print(SLB);
+      Serial.print(SLC);
+  
+      Serial.print(SLW1);
+      Serial.print(SLW2);
+
+      Serial.print(SW1);
+      Serial.print(SW2);
+
+      Serial.print(STCA1);
+      Serial.print(STCA2);
+      Serial.print(STCB1);
+      Serial.print(STCB2);
+      Serial.print(STCC1);
+      Serial.print(STCC2);
+    }
+  }
 }
 
 void fsm(){
@@ -209,15 +219,14 @@ void fsm(){
 
     //---------------------------------------------------- TOMBOL DITEKAN
     if (input==SRAC_PRESS) {
-      
       STCC1 = "TCC1 OFF|";
       STCA2 = "TCA2 OFF|";
-//      delay(3000);
       if(RTCC1==HIGH&&RTCA2==HIGH) {
         Serial.print(STCC1);
         Serial.print(STCA2);
-        state = 110;
+        w2.attach(25);
         w2.write(120);
+        state = 110;
       }
       else {
         state = 100;
@@ -230,8 +239,9 @@ void fsm(){
       if(RTCA1==HIGH&&RTCC2==HIGH) {
         Serial.print(STCA1);
         Serial.print(STCC2);
-        state = 210;
+        w1.attach(24);
         w1.write(120);
+        state = 210;
       }
       else {
         state = 100;
@@ -244,8 +254,9 @@ void fsm(){
       if(RTCC1==HIGH&&RTCB2==HIGH) {
         Serial.print(STCC1);
         Serial.print(STCB2);
-        state = 310;
+        w2.attach(25);
         w2.write(45);
+        state = 310;
       }
       else {
         state = 100;
@@ -258,8 +269,9 @@ void fsm(){
       if(RTCB2==HIGH&&RTCC2==HIGH) {
         Serial.print(STCB1);
         Serial.print(STCC2);
-        state = 410;
+        w1.attach(24);
         w1.write(45);
+        state = 410;
       }
       else {
         state = 100;
@@ -274,6 +286,7 @@ void fsm(){
     
     if (RTCA1==LOW) {
       Serial.print(STCA1);
+      w2.detach();
       state = 111;
     }
     else {
@@ -343,6 +356,8 @@ void fsm(){
       Serial.print(STCC1);
       Serial.print(STCA2);
       Serial.print(STCA1);
+      SetRouteButtonnow = 2;
+      input = 0;
       state = 100;
     }
     else {
@@ -356,6 +371,7 @@ void fsm(){
     
     if (RTCC1==LOW) {
       Serial.print(STCC1);
+      w1.detach();
       state = 211;
       
     }
@@ -423,8 +439,9 @@ void fsm(){
       Serial.print(STCA1);
       Serial.print(STCC2);
       Serial.print(STCC1);
-      state = 100;  
       SetRouteButtonnow = 3;
+      input = 0;
+      state = 100;
     }
     else {
       state = 212;
@@ -437,6 +454,7 @@ void fsm(){
     
     if (RTCB1==LOW) {
       Serial.print(STCB1);
+      w2.detach();
       state = 311;
       
     }
@@ -507,9 +525,9 @@ void fsm(){
       Serial.print(STCC1);
       Serial.print(STCB2);
       Serial.print(STCB1);
-      state = 100;
       SetRouteButtonnow = 4;
-      
+      input = 0;
+      state = 100;
     }
     else {
       state = 312;
@@ -522,6 +540,7 @@ void fsm(){
    
     if (RTCC1==LOW) {
       Serial.print(STCC1);
+      w1.detach();
       state = 411;
       
     }
@@ -592,9 +611,9 @@ void fsm(){
       Serial.print(STCB1);
       Serial.print(STCC2);
       Serial.print(STCC1);
-      state = 100;
       SetRouteButtonnow = 1;
-      
+      input = 0;
+      state = 100;
     }
     else {
       state = 412;
