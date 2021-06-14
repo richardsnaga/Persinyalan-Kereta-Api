@@ -116,7 +116,8 @@ void loop() {
   if(Serial.available()>0&&state==100){
     SetRouteButton = Serial.read();
     if(Habisdari!=SetRouteButton){
-      if(Habisdari==1&&SetRouteButton==2||Habisdari==2&&SetRouteButton==3||Habisdari==2&&SetRouteButton==4||Habisdari==3&&SetRouteButton==1||Habisdari==4&&SetRouteButton==1||Habisdari==4&&SetRouteButton==2){
+      if(Habisdari==1&&SetRouteButton==3||Habisdari==2&&SetRouteButton==3||Habisdari==2&&SetRouteButton==4||Habisdari==3&&SetRouteButton==1||Habisdari==4&&SetRouteButton==1||Habisdari==4&&SetRouteButton==2){
+        //Habisdari==AC&&SetRouteButton==BC||Habisdari==CA&&SetRouteButton==BC||Habisdari==CA&&SetRouteButton==CB||Habisdari==BC&&SetRouteButton==AC||Habisdari==CB&&SetRouteButton==AC||Habisdari==CB&&SetRouteButton==CA
         SetRouteButton = 0;
       }
       else{
@@ -178,7 +179,7 @@ void blt(){
       Serial.print(STCC1);
       Serial.print(STCC2);
     }
-  
+    delay(1000);
 }
 
 void fsm(){
@@ -224,8 +225,7 @@ void fsm(){
     Serial.print(STCC2);
 
     
-    Serial.print(input);
-    Serial.print("--------------------------------------------------------");
+
     //---------------------------------------------------- TOMBOL DITEKAN
     if (input==SRAC_PRESS) {
       STCC1 = "TCC1 OFF|";
@@ -235,6 +235,8 @@ void fsm(){
         Serial.print(STCA2);
         w2.attach(25);
         w2.write(120);
+        w1.attach(24);
+        w1.write(45);
         state = 110;
       }
       else {
@@ -250,6 +252,8 @@ void fsm(){
         Serial.print(STCC2);
         w1.attach(24);
         w1.write(120);
+        w2.attach(25);
+        w2.write(45);
         state = 210;
       }
       else {
@@ -263,6 +267,8 @@ void fsm(){
       if(RTCC1==HIGH&&RTCB2==HIGH) {
         Serial.print(STCC1);
         Serial.print(STCB2);
+        w1.attach(24);
+        w1.write(120);
         w2.attach(25);
         w2.write(45);
         state = 310;
@@ -278,6 +284,8 @@ void fsm(){
       if(RTCB2==HIGH&&RTCC2==HIGH) {
         Serial.print(STCB1);
         Serial.print(STCC2);
+        w2.attach(25);
+        w2.write(120);
         w1.attach(24);
         w1.write(45);
         state = 410;
@@ -295,7 +303,6 @@ void fsm(){
     
     if (RTCA1==LOW) {
       Serial.print(STCA1);
-      w2.detach();
       state = 111;
     }
     else {
@@ -326,6 +333,8 @@ void fsm(){
     STCA1 = "TCA1 OFF|";
     
     if (RTCA2==LOW&&RTCA1==HIGH) {
+      w2.detach();
+      w1.detach();
       Serial.print(STCA2);
       Serial.print(STCA1);
       state = 112;
@@ -380,7 +389,6 @@ void fsm(){
     
     if (RTCC1==LOW) {
       Serial.print(STCC1);
-      w1.detach();
       state = 211;
       
     }
@@ -411,6 +419,8 @@ void fsm(){
     STCC1 = "TCC1 OFF|";
     
     if (RTCC2==LOW&&RTCC1==HIGH) {
+      w2.detach();
+      w1.detach();
       Serial.print(STCC2);
       Serial.print(STCC1);
       state = 212;
@@ -463,7 +473,6 @@ void fsm(){
     
     if (RTCB1==LOW) {
       Serial.print(STCB1);
-      w2.detach();
       state = 311;
       
     }
@@ -496,6 +505,8 @@ void fsm(){
     STCB1 = "TCB1 OFF|";
     
     if (RTCB2==LOW&&RTCB1==HIGH) {
+      w2.detach();
+      w1.detach();
       Serial.print(STCB2);
       Serial.print(STCB1);
       state = 312;
@@ -549,7 +560,6 @@ void fsm(){
    
     if (RTCC1==LOW) {
       Serial.print(STCC1);
-      w1.detach();
       state = 411;
       
     }
@@ -582,6 +592,8 @@ void fsm(){
     STCC1 = "TCC1 OFF|";
     
     if (RTCC2==LOW&&RTCC1==HIGH) {
+      w2.detach();
+      w1.detach();
       Serial.print(STCC2);
       Serial.print(STCC1);
       state = 412;
